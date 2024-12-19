@@ -2,7 +2,7 @@ namespace netstd server_service
 
 struct VirtualNode
 {
-    1: i32 idServer,
+    1: string serverAddress,
     2: string hash
 }
 

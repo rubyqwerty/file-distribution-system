@@ -1,23 +1,24 @@
 using Microsoft.Extensions.Logging;
-using nodes;
 
 public class DistributionServiceHandler : distribution_service.DistributionService.IAsync
 {
-    public DistributionServiceHandler(ILogger<DistributionServiceHandler> logger, IServerNodesProvider serverNodesProvider, IStorage storage)
+    public DistributionServiceHandler(ILogger<DistributionServiceHandler> logger, storage.IStorage storage)
     {
         _logger = logger;
-        _serverNodesHandler = serverNodesProvider;
         _storage = storage;
         _logger.LogInformation("Создан обработчик запросов службы репликаций");
     }
 
-    public async Task<List<distribution_service.Replication>> MakeReplications(
+    public async Task MakeReplications(
         List<distribution_service.Chunk> requestChunks,
         CancellationToken cancellationToken)
     {
         try
         {
-            var serverNodes = _serverNodesHandler.GetServerNodes();
+
+            _logger.LogInformation($"Получен запрос на создание репликаций для файла с id: {requestChunks.FirstOrDefault().IdMetadata}");
+
+            var serverNodes = await _storage.GetVirtualNodes();
 
             List<ICircleNode> chunks = [];
 
@@ -27,65 +28,55 @@ public class DistributionServiceHandler : distribution_service.DistributionServi
                 {
                     chunks.Add(new CircleChunkNode()
                     {
-                        hash = chunk.ChunkHash
+                        hash = chunk.ChunkHash,
+                        generalFile = chunk.IdMetadata
                     });
                 }
             });
 
-            var placer = new PlaceFounder(serverNodes, chunks, 3);
+            List<ICircleNode> nodes = [];
+
+            await Task.Run(() =>
+          {
+              foreach (var node in serverNodes)
+              {
+                  nodes.Add(
+                        new CircleServerNode()
+                        {
+                            hash = node.Hash,
+                            generalServer = node.IdServer
+                        }
+                    );
+              }
+          });
+
+            var placer = new PlaceFounder(nodes, chunks, 3);
 
             placer.ComputePlacement();
 
             var placements = placer.Placement;
 
-            // List<distribution_service.Replication> replicationsResponse = [];
+            List<models.Replication> replications = [];
 
-            // foreach (var placement in placements)
-            // {
-            //     new distribution_service.Replication()
-            //     {
-            //         Chunk = new distribution_service.Chunk()
-            //         {
-            //             ChunkHash = placement.chunk.hash,
-            //             IdMetadata = requestChunks[0].IdMetadata
-            //         },
-            //         IdServer = placement.virtualServerNode.
-            //     };
-            // }
-
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(message: $"Исключение: {ex}");
-            throw;
-        }
-    }
-
-    public async Task<List<distribution_service.Replication>> GetReplications(int idMetadata, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var replications = await _storage.GetReplications(idMetadata);
-
-            List<distribution_service.Replication> replicationsResponse = [];
-
-            await Task.Run(() =>
+            foreach (var placement in placements)
             {
-                foreach (var replication in replications)
+                var replication = new models.Replication()
                 {
-                    replicationsResponse.Add(new distribution_service.Replication()
-                    {
-                        Chunk = new()
-                        {
-                            IdMetadata = replication.Chunk.IdMetadata,
-                            ChunkHash = replication.Chunk.Hash
-                        },
-                        IdServer = replication.IdServer
-                    });
-                }
-            });
+                    IdServer = ((CircleServerNode)placement.virtualServerNode).generalServer,
+                    HashChunk = placement.chunk.hash,
+                    IdMetadata = ((CircleChunkNode)placement.chunk).generalFile,
+                };
 
-            return replicationsResponse;
+                var server = await _storage.GetServer(replication.IdServer);
+
+                replications.Add(replication);
+
+                _logger.LogInformation($"Чанк {replication.HashChunk} --> Сервер {server.Address}");
+            }
+
+            await _storage.AddReplications(replications);
+
+            _logger.LogInformation("Репликации были успешно созданы");
         }
         catch (Exception ex)
         {
@@ -96,7 +87,5 @@ public class DistributionServiceHandler : distribution_service.DistributionServi
 
     private readonly ILogger<DistributionServiceHandler> _logger;
 
-    private readonly IServerNodesProvider _serverNodesHandler;
-
-    private readonly IStorage _storage;
+    private readonly storage.IStorage _storage;
 }

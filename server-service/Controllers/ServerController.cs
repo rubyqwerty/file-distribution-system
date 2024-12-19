@@ -4,19 +4,27 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/[controller]")]
 public class ServerController : ControllerBase
 {
-    public ServerController(ILogger logger, IStorage storage, VirtualNodeManager virtualNodeManager)
+    public ServerController(ILogger<ServerController> logger, storage.IStorage storage, VirtualNodeManager virtualNodeManager)
     {
         _logger = logger;
         _storageProvider = storage;
         _virtualNodeManager = virtualNodeManager;
+        _logger.LogInformation("Контроллер обработки серверов запущен");
     }
 
+    /// <summary>
+    /// Создать новый сервер
+    /// </summary>
+    /// <param name="server"></param>
+    /// <returns></returns>
     [HttpPost]
     public IActionResult Create([FromBody] models.Server server)
     {
         try
         {
-            _storageProvider.AddServer(server, _virtualNodeManager.CreateVirtualNodes);
+            _logger.LogInformation("Пришел запрос на создание сервера");
+
+            Task.Run(() => _storageProvider.AddServer(server, _virtualNodeManager.CreateVirtualNodes));
             return Ok();
         }
         catch (Exception ex)
@@ -30,7 +38,7 @@ public class ServerController : ControllerBase
     {
         try
         {
-            await _storageProvider.DeleteServer(idServer, _virtualNodeManager.DeleteVirtualNodes);
+            await _storageProvider.DeleteServer(idServer);
             return Ok();
         }
         catch (Exception ex)
@@ -40,11 +48,11 @@ public class ServerController : ControllerBase
     }
 
     [HttpGet("{idServer}")]
-    public IActionResult GetServer(int idServer)
+    public async Task<IActionResult> GetServer(int idServer)
     {
         try
         {
-            var server = _storageProvider.GetServer(idServer);
+            var server = await _storageProvider.GetServer(idServer);
             if (server == null)
             {
                 return NotFound();
@@ -57,7 +65,22 @@ public class ServerController : ControllerBase
         }
     }
 
-    private readonly IStorage _storageProvider;
-    private readonly ILogger _logger;
+    [HttpPut("{idServer}")]
+    public async Task<IActionResult> Update(int idServer, [FromBody] models.Server newServer)
+    {
+        try
+        {
+            await _storageProvider.UpdateServer(idServer, newServer, _virtualNodeManager.RecreateVirtualNodes);
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Problem($"Ошибка на сервере: {ex.Message}");
+        }
+    }
+
+    private readonly storage.IStorage _storageProvider;
+    private readonly ILogger<ServerController> _logger;
     private readonly VirtualNodeManager _virtualNodeManager;
 }

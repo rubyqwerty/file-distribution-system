@@ -1,23 +1,12 @@
-﻿
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-using chunk;
-using nodes;
+IHost host = Host.CreateDefaultBuilder(args)
+    .ConfigureServices(services =>
+    {
+        services.AddTransient<DistributionServiceHandler>();
+        services.AddHostedService<DistributionsThriftServer>();
+    })
+    .Build();
 
-var chunkHandler = new MockChunk();
-
-var chunks = chunkHandler.GetChunkNodes();
-
-var servNodesHandler = new MockNodes();
-
-var serverNodes = servNodesHandler.GetServerNodes();
-
-var placer = new PlaceFounder(serverNodes, chunks, 3);
-
-placer.ComputePlacement();
-
-var placement = placer.Placement;
-
-foreach (var place in placement)
-{
-    Console.WriteLine($"{place.chunk} --> {place.virtualServerNode}");
-}
+host.Run();

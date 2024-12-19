@@ -13,7 +13,7 @@ public partial class Server
 
     public int Priority { get; set; }
 
-    public virtual ICollection<Replication> Replications { get; set; } = new List<Replication>();
+    //  public virtual ICollection<Replication> Replications { get; set; } = new List<Replication>();
 
-    public virtual ICollection<VirtualNode> VirtualNodes { get; set; } = new List<VirtualNode>();
+    //public virtual ICollection<VirtualNode> VirtualNodes { get; set; } = new List<VirtualNode>();
 }

@@ -17,6 +17,8 @@ public class HashManager : IHashManager
 
         var hash = await client.GetHash(hashParams);
 
+        transport.Close();
+
         return hash;
     }
 }

@@ -27,7 +27,7 @@ public partial class MetadataContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlite("Data Source=/home/egor/projects/sql/metadata.db");
+        => optionsBuilder.UseSqlite("Data Source=../../DB/metadata.db");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -54,11 +54,11 @@ public partial class MetadataContext : DbContext
         modelBuilder.Entity<Metadata>(entity =>
         {
             entity.Property(e => e.CreationDate)
-                .HasDefaultValueSql("0")
+                .HasDefaultValueSql("'0'")
                 .HasColumnType("timestamp")
                 .HasColumnName("Creation_date");
             entity.Property(e => e.ModificationDate)
-                .HasDefaultValueSql("0")
+                .HasDefaultValueSql("'0'")
                 .HasColumnType("timestamp")
                 .HasColumnName("Modification_date");
             entity.Property(e => e.Name).HasColumnType("varchar(255)");
@@ -84,9 +84,9 @@ public partial class MetadataContext : DbContext
                 .HasColumnType("timestamp")
                 .HasColumnName("Creation_date");
 
-            entity.HasOne(d => d.IdServerNavigation).WithMany(p => p.Replications)
-                .HasForeignKey(d => d.IdServer)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+            // entity.HasOne(d => d.IdServerNavigation).WithMany(p => p.Replications)
+            //      .HasForeignKey(d => d.IdServer)
+            //    .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Chunk).WithMany(p => p.Replications)
                 .HasForeignKey(d => new { d.IdMetadata, d.HashChunk })
@@ -115,9 +115,9 @@ public partial class MetadataContext : DbContext
                 .HasColumnName("Id_server");
             entity.Property(e => e.Hash).HasColumnType("varchar(255)");
 
-            entity.HasOne(d => d.IdServerNavigation).WithMany(p => p.VirtualNodes)
-                .HasForeignKey(d => d.IdServer)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+            //   entity.HasOne(d => d.IdServerNavigation).WithMany(p => p.VirtualNodes)
+            //   .HasForeignKey(d => d.IdServer)
+            //  .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         OnModelCreatingPartial(modelBuilder);

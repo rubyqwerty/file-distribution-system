@@ -1,7 +1,7 @@
 
 public class VirtualNodeManager
 {
-    public VirtualNodeManager(IStorage storage, IHashManager hashManager)
+    public VirtualNodeManager(storage.IStorage storage, IHashManager hashManager)
     {
         _storageProvider = storage;
         _hashManager = hashManager;
@@ -19,7 +19,8 @@ public class VirtualNodeManager
             {
                 Data = hashedData,
                 NumberIteration = 2,
-                Algorithm = hash_service.Algorithms.SHA256
+                Algorithm = hash_service.Algorithms.SHA256,
+                OutputFormat = hash_service.Format.HEX
             });
 
             await _storageProvider.AddVirtualNode(new models.VirtualNode()
@@ -30,12 +31,19 @@ public class VirtualNodeManager
         }
     }
 
-    public void DeleteVirtualNodes(int idServer)
+    public void RecreateVirtualNodes(models.Server server)
     {
-
+        DeleteVirtualNodes(server);
+        CreateVirtualNodes(server);
     }
 
-    private readonly IStorage _storageProvider;
+
+    public void DeleteVirtualNodes(models.Server server)
+    {
+        _storageProvider.DeleteVirtualNodes(server.Id);
+    }
+
+    private readonly storage.IStorage _storageProvider;
 
     private readonly IHashManager _hashManager;
 }

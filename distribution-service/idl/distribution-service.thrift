@@ -8,17 +8,9 @@ struct Chunk
 
 typedef list<Chunk> Chunks 
 
-struct Replication
-{
-    1: Chunk chunk,
-    2: i32 idServer
-}
-
 service DistributionService
 {
-    list<Replication>  MakeReplications(1: Chunks chunks);
-
-    list<Replication>  GetReplications(1: i32 idMetadata);
+    void  MakeReplications(1: Chunks chunks);
 }
 
-//thrift --gen netstd --out api idl/distribution-service.thrift
+//thrift --gen netstd --out distribution-service/api distribution-service/idl/distribution-service.thrift

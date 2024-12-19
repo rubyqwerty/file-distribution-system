@@ -7,9 +7,9 @@ using Thrift.Protocol;
 using Thrift.Server;
 using Thrift.Transport.Server;
 
-public class HashThriftServer : IHostedService
+public class DistributionsThriftServer : IHostedService
 {
-    public HashThriftServer(ILogger<DistributionServiceHandler> logger, DistributionServiceHandler handler)
+    public DistributionsThriftServer(ILogger<DistributionServiceHandler> logger, DistributionServiceHandler handler)
     {
         _logger = logger;
 

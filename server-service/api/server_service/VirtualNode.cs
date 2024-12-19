@@ -36,19 +36,19 @@ namespace server_service
 
   public partial class VirtualNode : TBase
   {
-    private int _idServer;
+    private string _serverAddress;
     private string _hash;
 
-    public int IdServer
+    public string ServerAddress
     {
       get
       {
-        return _idServer;
+        return _serverAddress;
       }
       set
       {
-        __isset.idServer = true;
-        this._idServer = value;
+        __isset.serverAddress = true;
+        this._serverAddress = value;
       }
     }
 
@@ -69,7 +69,7 @@ namespace server_service
     public Isset __isset;
     public struct Isset
     {
-      public bool idServer;
+      public bool serverAddress;
       public bool @hash;
     }
 
@@ -80,11 +80,11 @@ namespace server_service
     public VirtualNode DeepCopy()
     {
       var tmp0 = new VirtualNode();
-      if(__isset.idServer)
+      if((ServerAddress != null) && __isset.serverAddress)
       {
-        tmp0.IdServer = this.IdServer;
+        tmp0.ServerAddress = this.ServerAddress;
       }
-      tmp0.__isset.idServer = this.__isset.idServer;
+      tmp0.__isset.serverAddress = this.__isset.serverAddress;
       if((Hash != null) && __isset.@hash)
       {
         tmp0.Hash = this.Hash;
@@ -111,9 +111,9 @@ namespace server_service
           switch (field.ID)
           {
             case 1:
-              if (field.Type == TType.I32)
+              if (field.Type == TType.String)
               {
-                IdServer = await iprot.ReadI32Async(cancellationToken);
+                ServerAddress = await iprot.ReadStringAsync(cancellationToken);
               }
               else
               {
@@ -154,13 +154,13 @@ namespace server_service
         var tmp1 = new TStruct("VirtualNode");
         await oprot.WriteStructBeginAsync(tmp1, cancellationToken);
         var tmp2 = new TField();
-        if(__isset.idServer)
+        if((ServerAddress != null) && __isset.serverAddress)
         {
-          tmp2.Name = "idServer";
-          tmp2.Type = TType.I32;
+          tmp2.Name = "serverAddress";
+          tmp2.Type = TType.String;
           tmp2.ID = 1;
           await oprot.WriteFieldBeginAsync(tmp2, cancellationToken);
-          await oprot.WriteI32Async(IdServer, cancellationToken);
+          await oprot.WriteStringAsync(ServerAddress, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Hash != null) && __isset.@hash)
@@ -185,16 +185,16 @@ namespace server_service
     {
       if (!(that is VirtualNode other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return ((__isset.idServer == other.__isset.idServer) && ((!__isset.idServer) || (global::System.Object.Equals(IdServer, other.IdServer))))
+      return ((__isset.serverAddress == other.__isset.serverAddress) && ((!__isset.serverAddress) || (global::System.Object.Equals(ServerAddress, other.ServerAddress))))
         && ((__isset.@hash == other.__isset.@hash) && ((!__isset.@hash) || (global::System.Object.Equals(Hash, other.Hash))));
     }
 
     public override int GetHashCode() {
       int hashcode = 157;
       unchecked {
-        if(__isset.idServer)
+        if((ServerAddress != null) && __isset.serverAddress)
         {
-          hashcode = (hashcode * 397) + IdServer.GetHashCode();
+          hashcode = (hashcode * 397) + ServerAddress.GetHashCode();
         }
         if((Hash != null) && __isset.@hash)
         {
@@ -208,11 +208,11 @@ namespace server_service
     {
       var tmp3 = new StringBuilder("VirtualNode(");
       int tmp4 = 0;
-      if(__isset.idServer)
+      if((ServerAddress != null) && __isset.serverAddress)
       {
         if(0 < tmp4++) { tmp3.Append(", "); }
-        tmp3.Append("IdServer: ");
-        IdServer.ToString(tmp3);
+        tmp3.Append("ServerAddress: ");
+        ServerAddress.ToString(tmp3);
       }
       if((Hash != null) && __isset.@hash)
       {

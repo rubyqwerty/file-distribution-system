@@ -49,37 +49,10 @@ namespace distribution_service
       if (source == null)
         return null;
 
-      var tmp60 = new List<global::distribution_service.Chunk>(source.Count);
+      var tmp27 = new List<global::distribution_service.Chunk>(source.Count);
       foreach (var elem in source)
-        tmp60.Add((elem != null) ? elem.DeepCopy() : null);
-      return tmp60;
-    }
-
-
-    public static bool Equals(this List<global::distribution_service.Replication> instance, object that)
-    {
-      if (!(that is List<global::distribution_service.Replication> other)) return false;
-      if (ReferenceEquals(instance, other)) return true;
-
-      return TCollections.Equals(instance, other);
-    }
-
-
-    public static int GetHashCode(this List<global::distribution_service.Replication> instance)
-    {
-      return TCollections.GetHashCode(instance);
-    }
-
-
-    public static List<global::distribution_service.Replication> DeepCopy(this List<global::distribution_service.Replication> source)
-    {
-      if (source == null)
-        return null;
-
-      var tmp61 = new List<global::distribution_service.Replication>(source.Count);
-      foreach (var elem in source)
-        tmp61.Add((elem != null) ? elem.DeepCopy() : null);
-      return tmp61;
+        tmp27.Add((elem != null) ? elem.DeepCopy() : null);
+      return tmp27;
     }
 
 

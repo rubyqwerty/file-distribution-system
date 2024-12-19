@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Shared\models\models.csproj" />
+    <ProjectReference Include="..\server-service\server-service.csproj" />
   </ItemGroup>
 
 </Project>

@@ -37,9 +37,7 @@ namespace distribution_service
   {
     public interface IAsync
     {
-      global::System.Threading.Tasks.Task<List<global::distribution_service.Replication>> MakeReplications(List<global::distribution_service.Chunk> @chunks, CancellationToken cancellationToken = default);
-
-      global::System.Threading.Tasks.Task<List<global::distribution_service.Replication>> GetReplications(int idMetadata, CancellationToken cancellationToken = default);
+      global::System.Threading.Tasks.Task MakeReplications(List<global::distribution_service.Chunk> @chunks, CancellationToken cancellationToken = default);
 
     }
 
@@ -54,84 +52,39 @@ namespace distribution_service
       {
       }
 
-      public async global::System.Threading.Tasks.Task<List<global::distribution_service.Replication>> MakeReplications(List<global::distribution_service.Chunk> @chunks, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task MakeReplications(List<global::distribution_service.Chunk> @chunks, CancellationToken cancellationToken = default)
       {
         await send_MakeReplications(@chunks, cancellationToken);
-        return await recv_MakeReplications(cancellationToken);
+        await recv_MakeReplications(cancellationToken);
       }
 
       public async global::System.Threading.Tasks.Task send_MakeReplications(List<global::distribution_service.Chunk> @chunks, CancellationToken cancellationToken = default)
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("MakeReplications", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp10 = new InternalStructs.MakeReplications_args() {
+        var tmp5 = new InternalStructs.MakeReplications_args() {
           Chunks = @chunks,
         };
         
-        await tmp10.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp5.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task<List<global::distribution_service.Replication>> recv_MakeReplications(CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task recv_MakeReplications(CancellationToken cancellationToken = default)
       {
         
-        var tmp11 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp11.Type == TMessageType.Exception)
+        var tmp6 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp6.Type == TMessageType.Exception)
         {
-          var tmp12 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp7 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp12;
+          throw tmp7;
         }
 
-        var tmp13 = new InternalStructs.MakeReplications_result();
-        await tmp13.ReadAsync(InputProtocol, cancellationToken);
+        var tmp8 = new InternalStructs.MakeReplications_result();
+        await tmp8.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp13.__isset.success)
-        {
-          return tmp13.Success;
-        }
-        throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "MakeReplications failed: unknown result");
-      }
-
-      public async global::System.Threading.Tasks.Task<List<global::distribution_service.Replication>> GetReplications(int idMetadata, CancellationToken cancellationToken = default)
-      {
-        await send_GetReplications(idMetadata, cancellationToken);
-        return await recv_GetReplications(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task send_GetReplications(int idMetadata, CancellationToken cancellationToken = default)
-      {
-        await OutputProtocol.WriteMessageBeginAsync(new TMessage("GetReplications", TMessageType.Call, SeqId), cancellationToken);
-        
-        var tmp14 = new InternalStructs.GetReplications_args() {
-          IdMetadata = idMetadata,
-        };
-        
-        await tmp14.WriteAsync(OutputProtocol, cancellationToken);
-        await OutputProtocol.WriteMessageEndAsync(cancellationToken);
-        await OutputProtocol.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task<List<global::distribution_service.Replication>> recv_GetReplications(CancellationToken cancellationToken = default)
-      {
-        
-        var tmp15 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp15.Type == TMessageType.Exception)
-        {
-          var tmp16 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
-          await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp16;
-        }
-
-        var tmp17 = new InternalStructs.GetReplications_result();
-        await tmp17.ReadAsync(InputProtocol, cancellationToken);
-        await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp17.__isset.success)
-        {
-          return tmp17.Success;
-        }
-        throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "GetReplications failed: unknown result");
       }
 
     }
@@ -146,7 +99,6 @@ namespace distribution_service
         _iAsync = iAsync ?? throw new ArgumentNullException(nameof(iAsync));
         _logger = logger;
         processMap_["MakeReplications"] = MakeReplications_ProcessAsync;
-        processMap_["GetReplications"] = GetReplications_ProcessAsync;
       }
 
       protected delegate global::System.Threading.Tasks.Task ProcessFunction(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken);
@@ -190,61 +142,30 @@ namespace distribution_service
 
       public async global::System.Threading.Tasks.Task MakeReplications_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp18 = new InternalStructs.MakeReplications_args();
-        await tmp18.ReadAsync(iprot, cancellationToken);
+        var tmp9 = new InternalStructs.MakeReplications_args();
+        await tmp9.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp19 = new InternalStructs.MakeReplications_result();
+        var tmp10 = new InternalStructs.MakeReplications_result();
         try
         {
-          tmp19.Success = await _iAsync.MakeReplications(tmp18.Chunks, cancellationToken);
+          await _iAsync.MakeReplications(tmp9.Chunks, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("MakeReplications", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp19.WriteAsync(oprot, cancellationToken);
+          await tmp10.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp20)
+        catch (Exception tmp11)
         {
-          var tmp21 = $"Error occurred in {GetType().FullName}: {tmp20.Message}";
+          var tmp12 = $"Error occurred in {GetType().FullName}: {tmp11.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp20, tmp21);
+            _logger.LogError("{Exception}, {Message}", tmp11, tmp12);
           else
-            Console.Error.WriteLine(tmp21);
-          var tmp22 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp12);
+          var tmp13 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("MakeReplications", TMessageType.Exception, seqid), cancellationToken);
-          await tmp22.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task GetReplications_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp23 = new InternalStructs.GetReplications_args();
-        await tmp23.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp24 = new InternalStructs.GetReplications_result();
-        try
-        {
-          tmp24.Success = await _iAsync.GetReplications(tmp23.IdMetadata, cancellationToken);
-          await oprot.WriteMessageBeginAsync(new TMessage("GetReplications", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp24.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp25)
-        {
-          var tmp26 = $"Error occurred in {GetType().FullName}: {tmp25.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp25, tmp26);
-          else
-            Console.Error.WriteLine(tmp26);
-          var tmp27 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("GetReplications", TMessageType.Exception, seqid), cancellationToken);
-          await tmp27.WriteAsync(oprot, cancellationToken);
+          await tmp13.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -285,13 +206,13 @@ namespace distribution_service
 
         public MakeReplications_args DeepCopy()
         {
-          var tmp28 = new MakeReplications_args();
+          var tmp14 = new MakeReplications_args();
           if((Chunks != null) && __isset.@chunks)
           {
-            tmp28.Chunks = this.Chunks.DeepCopy();
+            tmp14.Chunks = this.Chunks.DeepCopy();
           }
-          tmp28.__isset.@chunks = this.__isset.@chunks;
-          return tmp28;
+          tmp14.__isset.@chunks = this.__isset.@chunks;
+          return tmp14;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -315,14 +236,14 @@ namespace distribution_service
                   if (field.Type == TType.List)
                   {
                     {
-                      var _list29 = await iprot.ReadListBeginAsync(cancellationToken);
-                      Chunks = new List<global::distribution_service.Chunk>(_list29.Count);
-                      for(int _i30 = 0; _i30 < _list29.Count; ++_i30)
+                      var _list15 = await iprot.ReadListBeginAsync(cancellationToken);
+                      Chunks = new List<global::distribution_service.Chunk>(_list15.Count);
+                      for(int _i16 = 0; _i16 < _list15.Count; ++_i16)
                       {
-                        global::distribution_service.Chunk _elem31;
-                        _elem31 = new global::distribution_service.Chunk();
-                        await _elem31.ReadAsync(iprot, cancellationToken);
-                        Chunks.Add(_elem31);
+                        global::distribution_service.Chunk _elem17;
+                        _elem17 = new global::distribution_service.Chunk();
+                        await _elem17.ReadAsync(iprot, cancellationToken);
+                        Chunks.Add(_elem17);
                       }
                       await iprot.ReadListEndAsync(cancellationToken);
                     }
@@ -353,19 +274,19 @@ namespace distribution_service
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp32 = new TStruct("MakeReplications_args");
-            await oprot.WriteStructBeginAsync(tmp32, cancellationToken);
-            var tmp33 = new TField();
+            var tmp18 = new TStruct("MakeReplications_args");
+            await oprot.WriteStructBeginAsync(tmp18, cancellationToken);
+            var tmp19 = new TField();
             if((Chunks != null) && __isset.@chunks)
             {
-              tmp33.Name = "chunks";
-              tmp33.Type = TType.List;
-              tmp33.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp33, cancellationToken);
+              tmp19.Name = "chunks";
+              tmp19.Type = TType.List;
+              tmp19.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp19, cancellationToken);
               await oprot.WriteListBeginAsync(new TList(TType.Struct, Chunks.Count), cancellationToken);
-              foreach (global::distribution_service.Chunk _iter34 in Chunks)
+              foreach (global::distribution_service.Chunk _iter20 in Chunks)
               {
-                await _iter34.WriteAsync(oprot, cancellationToken);
+                await _iter20.WriteAsync(oprot, cancellationToken);
               }
               await oprot.WriteListEndAsync(cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
@@ -399,43 +320,22 @@ namespace distribution_service
 
         public override string ToString()
         {
-          var tmp35 = new StringBuilder("MakeReplications_args(");
-          int tmp36 = 0;
+          var tmp21 = new StringBuilder("MakeReplications_args(");
+          int tmp22 = 0;
           if((Chunks != null) && __isset.@chunks)
           {
-            if(0 < tmp36++) { tmp35.Append(", "); }
-            tmp35.Append("Chunks: ");
-            Chunks.ToString(tmp35);
+            if(0 < tmp22++) { tmp21.Append(", "); }
+            tmp21.Append("Chunks: ");
+            Chunks.ToString(tmp21);
           }
-          tmp35.Append(')');
-          return tmp35.ToString();
+          tmp21.Append(')');
+          return tmp21.ToString();
         }
       }
 
 
       public partial class MakeReplications_result : TBase
       {
-        private List<global::distribution_service.Replication> _success;
-
-        public List<global::distribution_service.Replication> Success
-        {
-          get
-          {
-            return _success;
-          }
-          set
-          {
-            __isset.@success = true;
-            this._success = value;
-          }
-        }
-
-
-        public Isset __isset;
-        public struct Isset
-        {
-          public bool @success;
-        }
 
         public MakeReplications_result()
         {
@@ -443,13 +343,8 @@ namespace distribution_service
 
         public MakeReplications_result DeepCopy()
         {
-          var tmp37 = new MakeReplications_result();
-          if((Success != null) && __isset.@success)
-          {
-            tmp37.Success = this.Success.DeepCopy();
-          }
-          tmp37.__isset.@success = this.__isset.@success;
-          return tmp37;
+          var tmp23 = new MakeReplications_result();
+          return tmp23;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -469,27 +364,6 @@ namespace distribution_service
 
               switch (field.ID)
               {
-                case 0:
-                  if (field.Type == TType.List)
-                  {
-                    {
-                      var _list38 = await iprot.ReadListBeginAsync(cancellationToken);
-                      Success = new List<global::distribution_service.Replication>(_list38.Count);
-                      for(int _i39 = 0; _i39 < _list38.Count; ++_i39)
-                      {
-                        global::distribution_service.Replication _elem40;
-                        _elem40 = new global::distribution_service.Replication();
-                        await _elem40.ReadAsync(iprot, cancellationToken);
-                        Success.Add(_elem40);
-                      }
-                      await iprot.ReadListEndAsync(cancellationToken);
-                    }
-                  }
-                  else
-                  {
-                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
-                  }
-                  break;
                 default: 
                   await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
                   break;
@@ -511,27 +385,8 @@ namespace distribution_service
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp41 = new TStruct("MakeReplications_result");
-            await oprot.WriteStructBeginAsync(tmp41, cancellationToken);
-            var tmp42 = new TField();
-
-            if(this.__isset.@success)
-            {
-              if (Success != null)
-              {
-                tmp42.Name = "Success";
-                tmp42.Type = TType.List;
-                tmp42.ID = 0;
-                await oprot.WriteFieldBeginAsync(tmp42, cancellationToken);
-                await oprot.WriteListBeginAsync(new TList(TType.Struct, Success.Count), cancellationToken);
-                foreach (global::distribution_service.Replication _iter43 in Success)
-                {
-                  await _iter43.WriteAsync(oprot, cancellationToken);
-                }
-                await oprot.WriteListEndAsync(cancellationToken);
-                await oprot.WriteFieldEndAsync(cancellationToken);
-              }
-            }
+            var tmp24 = new TStruct("MakeReplications_result");
+            await oprot.WriteStructBeginAsync(tmp24, cancellationToken);
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
           }
@@ -545,336 +400,21 @@ namespace distribution_service
         {
           if (!(that is MakeReplications_result other)) return false;
           if (ReferenceEquals(this, other)) return true;
-          return ((__isset.@success == other.__isset.@success) && ((!__isset.@success) || (TCollections.Equals(Success, other.Success))));
+          return true;
         }
 
         public override int GetHashCode() {
           int hashcode = 157;
           unchecked {
-            if((Success != null) && __isset.@success)
-            {
-              hashcode = (hashcode * 397) + TCollections.GetHashCode(Success);
-            }
           }
           return hashcode;
         }
 
         public override string ToString()
         {
-          var tmp44 = new StringBuilder("MakeReplications_result(");
-          int tmp45 = 0;
-          if((Success != null) && __isset.@success)
-          {
-            if(0 < tmp45++) { tmp44.Append(", "); }
-            tmp44.Append("Success: ");
-            Success.ToString(tmp44);
-          }
-          tmp44.Append(')');
-          return tmp44.ToString();
-        }
-      }
-
-
-      public partial class GetReplications_args : TBase
-      {
-        private int _idMetadata;
-
-        public int IdMetadata
-        {
-          get
-          {
-            return _idMetadata;
-          }
-          set
-          {
-            __isset.idMetadata = true;
-            this._idMetadata = value;
-          }
-        }
-
-
-        public Isset __isset;
-        public struct Isset
-        {
-          public bool idMetadata;
-        }
-
-        public GetReplications_args()
-        {
-        }
-
-        public GetReplications_args DeepCopy()
-        {
-          var tmp46 = new GetReplications_args();
-          if(__isset.idMetadata)
-          {
-            tmp46.IdMetadata = this.IdMetadata;
-          }
-          tmp46.__isset.idMetadata = this.__isset.idMetadata;
-          return tmp46;
-        }
-
-        public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
-        {
-          iprot.IncrementRecursionDepth();
-          try
-          {
-            TField field;
-            await iprot.ReadStructBeginAsync(cancellationToken);
-            while (true)
-            {
-              field = await iprot.ReadFieldBeginAsync(cancellationToken);
-              if (field.Type == TType.Stop)
-              {
-                break;
-              }
-
-              switch (field.ID)
-              {
-                case 1:
-                  if (field.Type == TType.I32)
-                  {
-                    IdMetadata = await iprot.ReadI32Async(cancellationToken);
-                  }
-                  else
-                  {
-                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
-                  }
-                  break;
-                default: 
-                  await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
-                  break;
-              }
-
-              await iprot.ReadFieldEndAsync(cancellationToken);
-            }
-
-            await iprot.ReadStructEndAsync(cancellationToken);
-          }
-          finally
-          {
-            iprot.DecrementRecursionDepth();
-          }
-        }
-
-        public async global::System.Threading.Tasks.Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
-        {
-          oprot.IncrementRecursionDepth();
-          try
-          {
-            var tmp47 = new TStruct("GetReplications_args");
-            await oprot.WriteStructBeginAsync(tmp47, cancellationToken);
-            var tmp48 = new TField();
-            if(__isset.idMetadata)
-            {
-              tmp48.Name = "idMetadata";
-              tmp48.Type = TType.I32;
-              tmp48.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp48, cancellationToken);
-              await oprot.WriteI32Async(IdMetadata, cancellationToken);
-              await oprot.WriteFieldEndAsync(cancellationToken);
-            }
-            await oprot.WriteFieldStopAsync(cancellationToken);
-            await oprot.WriteStructEndAsync(cancellationToken);
-          }
-          finally
-          {
-            oprot.DecrementRecursionDepth();
-          }
-        }
-
-        public override bool Equals(object that)
-        {
-          if (!(that is GetReplications_args other)) return false;
-          if (ReferenceEquals(this, other)) return true;
-          return ((__isset.idMetadata == other.__isset.idMetadata) && ((!__isset.idMetadata) || (global::System.Object.Equals(IdMetadata, other.IdMetadata))));
-        }
-
-        public override int GetHashCode() {
-          int hashcode = 157;
-          unchecked {
-            if(__isset.idMetadata)
-            {
-              hashcode = (hashcode * 397) + IdMetadata.GetHashCode();
-            }
-          }
-          return hashcode;
-        }
-
-        public override string ToString()
-        {
-          var tmp49 = new StringBuilder("GetReplications_args(");
-          int tmp50 = 0;
-          if(__isset.idMetadata)
-          {
-            if(0 < tmp50++) { tmp49.Append(", "); }
-            tmp49.Append("IdMetadata: ");
-            IdMetadata.ToString(tmp49);
-          }
-          tmp49.Append(')');
-          return tmp49.ToString();
-        }
-      }
-
-
-      public partial class GetReplications_result : TBase
-      {
-        private List<global::distribution_service.Replication> _success;
-
-        public List<global::distribution_service.Replication> Success
-        {
-          get
-          {
-            return _success;
-          }
-          set
-          {
-            __isset.@success = true;
-            this._success = value;
-          }
-        }
-
-
-        public Isset __isset;
-        public struct Isset
-        {
-          public bool @success;
-        }
-
-        public GetReplications_result()
-        {
-        }
-
-        public GetReplications_result DeepCopy()
-        {
-          var tmp51 = new GetReplications_result();
-          if((Success != null) && __isset.@success)
-          {
-            tmp51.Success = this.Success.DeepCopy();
-          }
-          tmp51.__isset.@success = this.__isset.@success;
-          return tmp51;
-        }
-
-        public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
-        {
-          iprot.IncrementRecursionDepth();
-          try
-          {
-            TField field;
-            await iprot.ReadStructBeginAsync(cancellationToken);
-            while (true)
-            {
-              field = await iprot.ReadFieldBeginAsync(cancellationToken);
-              if (field.Type == TType.Stop)
-              {
-                break;
-              }
-
-              switch (field.ID)
-              {
-                case 0:
-                  if (field.Type == TType.List)
-                  {
-                    {
-                      var _list52 = await iprot.ReadListBeginAsync(cancellationToken);
-                      Success = new List<global::distribution_service.Replication>(_list52.Count);
-                      for(int _i53 = 0; _i53 < _list52.Count; ++_i53)
-                      {
-                        global::distribution_service.Replication _elem54;
-                        _elem54 = new global::distribution_service.Replication();
-                        await _elem54.ReadAsync(iprot, cancellationToken);
-                        Success.Add(_elem54);
-                      }
-                      await iprot.ReadListEndAsync(cancellationToken);
-                    }
-                  }
-                  else
-                  {
-                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
-                  }
-                  break;
-                default: 
-                  await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
-                  break;
-              }
-
-              await iprot.ReadFieldEndAsync(cancellationToken);
-            }
-
-            await iprot.ReadStructEndAsync(cancellationToken);
-          }
-          finally
-          {
-            iprot.DecrementRecursionDepth();
-          }
-        }
-
-        public async global::System.Threading.Tasks.Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
-        {
-          oprot.IncrementRecursionDepth();
-          try
-          {
-            var tmp55 = new TStruct("GetReplications_result");
-            await oprot.WriteStructBeginAsync(tmp55, cancellationToken);
-            var tmp56 = new TField();
-
-            if(this.__isset.@success)
-            {
-              if (Success != null)
-              {
-                tmp56.Name = "Success";
-                tmp56.Type = TType.List;
-                tmp56.ID = 0;
-                await oprot.WriteFieldBeginAsync(tmp56, cancellationToken);
-                await oprot.WriteListBeginAsync(new TList(TType.Struct, Success.Count), cancellationToken);
-                foreach (global::distribution_service.Replication _iter57 in Success)
-                {
-                  await _iter57.WriteAsync(oprot, cancellationToken);
-                }
-                await oprot.WriteListEndAsync(cancellationToken);
-                await oprot.WriteFieldEndAsync(cancellationToken);
-              }
-            }
-            await oprot.WriteFieldStopAsync(cancellationToken);
-            await oprot.WriteStructEndAsync(cancellationToken);
-          }
-          finally
-          {
-            oprot.DecrementRecursionDepth();
-          }
-        }
-
-        public override bool Equals(object that)
-        {
-          if (!(that is GetReplications_result other)) return false;
-          if (ReferenceEquals(this, other)) return true;
-          return ((__isset.@success == other.__isset.@success) && ((!__isset.@success) || (TCollections.Equals(Success, other.Success))));
-        }
-
-        public override int GetHashCode() {
-          int hashcode = 157;
-          unchecked {
-            if((Success != null) && __isset.@success)
-            {
-              hashcode = (hashcode * 397) + TCollections.GetHashCode(Success);
-            }
-          }
-          return hashcode;
-        }
-
-        public override string ToString()
-        {
-          var tmp58 = new StringBuilder("GetReplications_result(");
-          int tmp59 = 0;
-          if((Success != null) && __isset.@success)
-          {
-            if(0 < tmp59++) { tmp58.Append(", "); }
-            tmp58.Append("Success: ");
-            Success.ToString(tmp58);
-          }
-          tmp58.Append(')');
-          return tmp58.ToString();
+          var tmp25 = new StringBuilder("MakeReplications_result(");
+          tmp25.Append(')');
+          return tmp25.ToString();
         }
       }
 

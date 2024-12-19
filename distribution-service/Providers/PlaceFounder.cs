@@ -74,6 +74,11 @@ public class PlaceFounder
     /// <param name="numberOfReplication"></param>
     public PlaceFounder(List<ICircleNode> serverNodes, List<ICircleNode> chunkNodes, int numberOfReplication)
     {
+        if (numberOfReplication > serverNodes.Count())
+        {
+            throw new Exception("Количество репликаций превышает количество узлов");
+        }
+
         var comparer = Comparer<ICircleNode>.Create((p1, p2) => p1.hash.CompareTo(p2.hash));
 
         _serverNodes = new(serverNodes, comparer);
@@ -90,8 +95,6 @@ public class PlaceFounder
     /// </summary>
     public void ComputePlacement()
     {
-
-
         GroupNodes group = new(_numberOfReplications);
 
         group.AddGroupNode(_serverNodes.TakeLast(_numberOfReplications).ToList());

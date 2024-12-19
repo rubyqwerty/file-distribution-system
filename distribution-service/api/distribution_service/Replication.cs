@@ -37,7 +37,7 @@ namespace distribution_service
   public partial class Replication : TBase
   {
     private global::distribution_service.Chunk _chunk;
-    private int _idServer;
+    private string _address;
 
     public global::distribution_service.Chunk Chunk
     {
@@ -52,16 +52,16 @@ namespace distribution_service
       }
     }
 
-    public int IdServer
+    public string Address
     {
       get
       {
-        return _idServer;
+        return _address;
       }
       set
       {
-        __isset.idServer = true;
-        this._idServer = value;
+        __isset.@address = true;
+        this._address = value;
       }
     }
 
@@ -70,7 +70,7 @@ namespace distribution_service
     public struct Isset
     {
       public bool @chunk;
-      public bool idServer;
+      public bool @address;
     }
 
     public Replication()
@@ -85,11 +85,11 @@ namespace distribution_service
         tmp5.Chunk = (global::distribution_service.Chunk)this.Chunk.DeepCopy();
       }
       tmp5.__isset.@chunk = this.__isset.@chunk;
-      if(__isset.idServer)
+      if((Address != null) && __isset.@address)
       {
-        tmp5.IdServer = this.IdServer;
+        tmp5.Address = this.Address;
       }
-      tmp5.__isset.idServer = this.__isset.idServer;
+      tmp5.__isset.@address = this.__isset.@address;
       return tmp5;
     }
 
@@ -122,9 +122,9 @@ namespace distribution_service
               }
               break;
             case 2:
-              if (field.Type == TType.I32)
+              if (field.Type == TType.String)
               {
-                IdServer = await iprot.ReadI32Async(cancellationToken);
+                Address = await iprot.ReadStringAsync(cancellationToken);
               }
               else
               {
@@ -164,13 +164,13 @@ namespace distribution_service
           await Chunk.WriteAsync(oprot, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
-        if(__isset.idServer)
+        if((Address != null) && __isset.@address)
         {
-          tmp7.Name = "idServer";
-          tmp7.Type = TType.I32;
+          tmp7.Name = "address";
+          tmp7.Type = TType.String;
           tmp7.ID = 2;
           await oprot.WriteFieldBeginAsync(tmp7, cancellationToken);
-          await oprot.WriteI32Async(IdServer, cancellationToken);
+          await oprot.WriteStringAsync(Address, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         await oprot.WriteFieldStopAsync(cancellationToken);
@@ -187,7 +187,7 @@ namespace distribution_service
       if (!(that is Replication other)) return false;
       if (ReferenceEquals(this, other)) return true;
       return ((__isset.@chunk == other.__isset.@chunk) && ((!__isset.@chunk) || (global::System.Object.Equals(Chunk, other.Chunk))))
-        && ((__isset.idServer == other.__isset.idServer) && ((!__isset.idServer) || (global::System.Object.Equals(IdServer, other.IdServer))));
+        && ((__isset.@address == other.__isset.@address) && ((!__isset.@address) || (global::System.Object.Equals(Address, other.Address))));
     }
 
     public override int GetHashCode() {
@@ -197,9 +197,9 @@ namespace distribution_service
         {
           hashcode = (hashcode * 397) + Chunk.GetHashCode();
         }
-        if(__isset.idServer)
+        if((Address != null) && __isset.@address)
         {
-          hashcode = (hashcode * 397) + IdServer.GetHashCode();
+          hashcode = (hashcode * 397) + Address.GetHashCode();
         }
       }
       return hashcode;
@@ -215,11 +215,11 @@ namespace distribution_service
         tmp8.Append("Chunk: ");
         Chunk.ToString(tmp8);
       }
-      if(__isset.idServer)
+      if((Address != null) && __isset.@address)
       {
         if(0 < tmp9++) { tmp8.Append(", "); }
-        tmp8.Append("IdServer: ");
-        IdServer.ToString(tmp8);
+        tmp8.Append("Address: ");
+        Address.ToString(tmp8);
       }
       tmp8.Append(')');
       return tmp8.ToString();
