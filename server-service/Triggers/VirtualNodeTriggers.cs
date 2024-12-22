@@ -1,10 +1,11 @@
 
 public class VirtualNodeManager
 {
-    public VirtualNodeManager(storage.IStorage storage, IHashManager hashManager)
+    public VirtualNodeManager(storage.IStorage storage, IHashManager hashManager, ILogger<VirtualNodeManager> logger)
     {
         _storageProvider = storage;
         _hashManager = hashManager;
+        _logger = logger;
     }
 
     public async void CreateVirtualNodes(models.Server server)
@@ -23,6 +24,8 @@ public class VirtualNodeManager
                 OutputFormat = hash_service.Format.HEX
             });
 
+            _logger.LogInformation($"Триггер создание виртуальных узлов: id {server.Id}, hash {hash}");
+
             await _storageProvider.AddVirtualNode(new models.VirtualNode()
             {
                 Hash = hash,
@@ -40,10 +43,11 @@ public class VirtualNodeManager
 
     public void DeleteVirtualNodes(models.Server server)
     {
+        _logger.LogInformation($"Триггер удаление виртуальных узлов от сервера с id {server.Id}");
         _storageProvider.DeleteVirtualNodes(server.Id);
     }
 
+    private readonly ILogger<VirtualNodeManager> _logger;
     private readonly storage.IStorage _storageProvider;
-
     private readonly IHashManager _hashManager;
 }

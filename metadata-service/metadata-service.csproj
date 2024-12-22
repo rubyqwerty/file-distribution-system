@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.10" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
@@ -15,7 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Shared\ORM\models.csproj" />
     <ProjectReference Include="..\distribution-service\distribution-service.csproj" />
-    <ProjectReference Include="..\Shared\Clients\Clients.csproj" />
+    <ProjectReference Include="..\hash-service\hash-service.csproj" />
   </ItemGroup>
 
 </Project>

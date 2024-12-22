@@ -5,7 +5,10 @@ public class ApplicationContext : models.MetadataContext
 {
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var connection = new SqliteConnection("Data Source=/home/egor/projects/file-distribution-system/Shared/DB/metadata.db");
+        var connectionsLine = Environment.GetEnvironmentVariable("DB_HOST") ??
+            "Data Source=/home/egor/projects/file-distribution-system/Shared/DB/metadata.db";
+
+        var connection = new SqliteConnection(connectionsLine);
         connection.StateChange += (sender, e) =>
         {
             if (e.CurrentState == System.Data.ConnectionState.Open)

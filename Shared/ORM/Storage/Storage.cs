@@ -97,6 +97,35 @@ public interface IStorage
     /// <param name="chunk"></param>
     /// <returns></returns>
     public Task<models.Chunk> AddChunk(models.Chunk chunk);
+    /// <summary>
+    /// Получить чанки, принадлежащие файлу
+    /// </summary>
+    /// <param name="idMetadata"></param>
+    /// <returns></returns>
+    public Task<List<models.Chunk>> GetChunkByMetadataId(int idMetadata);
+    /// <summary>
+    /// Получить метаданные по хэшу чанка
+    /// </summary>
+    /// <param name="hash"></param>
+    /// <returns></returns>
+    public Task<models.Metadata> GetMetadataByChunkHash(string hash);
+    /// <summary>
+    /// Получить метаданные по id
+    /// </summary>
+    /// <param name="idMetadata"></param>
+    /// <returns></returns>
+    public Task<models.Metadata> GetMetadataById(int idMetadata);
+    /// <summary>
+    /// Получить все доступные метаданные
+    /// </summary>
+    /// <returns></returns>
+    public Task<List<models.Metadata>> GetMetadata();
+    /// <summary>
+    /// Удаление метаданных по id
+    /// </summary>
+    /// <param name="idMetadata"></param>
+    /// <returns></returns>
+    public Task DeleteMetadataById(int idMetadata);
 }
 
 public class Storage : IStorage
@@ -263,5 +292,65 @@ public class Storage : IStorage
         return addedChunk.Entity;
     }
 
+    public async Task<List<models.Chunk>> GetChunkByMetadataId(int idMetadata)
+    {
+        ApplicationContext db = new();
+
+        var chunks = await (from chunk in db.Chunks
+                            where chunk.IdMetadata == idMetadata
+                            orderby chunk.Position ascending
+                            select chunk).ToListAsync() ??
+                        throw new KeyNotFoundException($"Не найдено ни одного чанка для метаданных с id {idMetadata}");
+
+        return chunks;
+    }
+
+    public async Task<models.Metadata> GetMetadataByChunkHash(string hash)
+    {
+        ApplicationContext db = new();
+
+        var chunk = await (from chnk in db.Chunks
+                           where chnk.Hash == hash
+                           select chnk).FirstOrDefaultAsync() ??
+                        throw new KeyNotFoundException($"Не найдено ни одного чанка c hash {hash}");
+
+        var metadata = await (from meta in db.Metadata
+                              where meta.Id == chunk.IdMetadata
+                              select meta).FirstOrDefaultAsync() ??
+                            throw new KeyNotFoundException($"Не найдено ни объекта метаданных с id {chunk.IdMetadata}");
+
+        return metadata;
+
+    }
+
+    public async Task<models.Metadata> GetMetadataById(int idMetadata)
+    {
+        ApplicationContext db = new();
+        var metadata = await (from meta in db.Metadata
+                              where meta.Id == idMetadata
+                              select meta).FirstOrDefaultAsync() ??
+                       throw new KeyNotFoundException($"Не найдены метаданные с id {idMetadata}");
+
+        return metadata;
+    }
+
+    public async Task<List<models.Metadata>> GetMetadata()
+    {
+        ApplicationContext db = new();
+        return await db.Metadata.ToListAsync();
+    }
+
+    public async Task DeleteMetadataById(int idMetadata)
+    {
+        ApplicationContext db = new();
+        var metadata = await (from meta in db.Metadata
+                              where meta.Id == idMetadata
+                              select meta).FirstOrDefaultAsync() ??
+                       throw new KeyNotFoundException($"Не найдены метаданные с id {idMetadata}");
+
+        db.Metadata.Remove(metadata);
+
+        await db.SaveChangesAsync();
+    }
 
 }

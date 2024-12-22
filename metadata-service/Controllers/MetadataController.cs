@@ -1,15 +1,16 @@
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using models;
 
 [ApiController]
 [Route("api/[controller]")]
-public class MetadataController : ControllerBase
+public class FileController : ControllerBase
 {
-    public MetadataController(ILogger<MetadataController> logger, storage.IStorage storage)
+    public FileController(ILogger<FileController> logger, storage.IStorage storage, IFileStorage fileStorage)
     {
         _logger = logger;
         _storageProvider = storage;
-        _logger.LogInformation("Контроллер обработки серверов запущен");
+        _fileStorage = fileStorage;
     }
 
     /// <summary>
@@ -27,57 +28,152 @@ public class MetadataController : ControllerBase
         var fileName = file.FileName;
         var fileSize = file.Length;
 
-        var addedFile = await _storageProvider.AddMetadata(new models.Metadata()
+        var addedFile = _storageProvider.AddMetadata(new models.Metadata()
         {
             Name = fileName,
             Size = (int)fileSize,
             CreationDate = DateTime.UtcNow,
             ModificationDate = DateTime.UtcNow
-        });
+        }).Result;
 
-        var chunks = await FileSplitter.SplitStreamAsync(file, 32);
-
-
-        List<models.Chunk> addedChunks = [];
-
-        HashManager manager = new();
-
-        List<distribution_service.Chunk> replicationRequest = [];
-        var counter = 0;
-        foreach (var chunk in chunks)
+        try
         {
-            var hash = await _hashManager.GetHash(new hash_service.HashParams()
-            {
-                Data = addedFile.Id.ToString() + addedFile.Name + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
-                NumberIteration = 2,
-                Algorithm = hash_service.Algorithms.SHA256,
-                OutputFormat = hash_service.Format.HEX
-            });
+            StoredChunk storedChunks = new() { Chunks = await FileSplitter.SplitStreamAsync(file, (int)fileSize / 5) };
 
-            addedChunks.Add(await _storageProvider.AddChunk(new models.Chunk()
+            var counter = 0;
+            foreach (var chunk in storedChunks.Chunks)
             {
-                IdMetadata = addedFile.Id,
-                Hash = hash,
-                Position = counter++,
-                Size = (int)chunk.Length
-            }));
+                var hash = new HashManager().GetHash(new hash_service.HashParams()
+                {
+                    Data = addedFile.Id.ToString() + addedFile.Name + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
+                    NumberIteration = 2,
+                    Algorithm = hash_service.Algorithms.SHA256,
+                    OutputFormat = hash_service.Format.HEX
+                }).Result;
 
-            replicationRequest.Add(new distribution_service.Chunk()
+                storedChunks.Hashes.Add(hash);
+
+                await _storageProvider.AddChunk(new models.Chunk()
+                {
+                    IdMetadata = addedFile.Id,
+                    Hash = hash,
+                    Position = counter++,
+                    Size = (int)chunk.Length
+                });
+            }
+
+            new DistributionManager().MakeReplication(addedFile.Id).Wait();
+
+
+            // Распределение файлов
+            for (int i = 0; i < storedChunks.Chunks.Count; ++i)
             {
-                ChunkHash = addedChunks.Last().Hash,
-                IdMetadata = addedChunks.Last().IdMetadata
-            });
+                var replications = _storageProvider.GetReplications(storedChunks.Hashes[i]).Result;
+
+                foreach (var replication in replications)
+                {
+                    var server = _storageProvider.GetServer(replication.IdServer).Result;
+
+                    _fileStorage.SendChunkToStorage(storedChunks.Chunks[i], storedChunks.Hashes[i], server.Address).Wait();
+                }
+            }
         }
-
-
-
-
+        catch (Exception ex)
+        {
+            _logger.LogInformation($"Чанки не были размещены, ошибка {ex.Message}");
+        }
 
 
         return Ok(addedFile);
     }
 
-    private readonly IHashManager _hashManager;
+    /// <summary>
+    /// Получить файл
+    /// </summary>
+    /// <param name="idMetadata"></param>
+    /// <returns></returns>
+    [HttpGet("{idMetadata}")]
+    public async Task<ActionResult> GetFile(int idMetadata)
+    {
+        try
+        {
+            var chunks = await _storageProvider.GetChunkByMetadataId(idMetadata);
+
+            List<Task<MemoryStream>> chunksInFile = [];
+
+            foreach (var chunk in chunks)
+            {
+                var replications = await _storageProvider.GetReplications(chunk.Hash);
+
+                foreach (var replication in replications)
+                {
+                    var address = _storageProvider.GetServer(replication.IdServer).Result.Address;
+                    try
+                    {
+                        chunksInFile.Add(_fileStorage.GetChunkFromStorage(address, chunk.Hash));
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogInformation($"Не получилось считать чанк: {replication.HashChunk} из {address} {ex.Message}");
+                    }
+                }
+            }
+
+            var metadata = await _storageProvider.GetMetadataById(idMetadata);
+
+            var sourceFile = FileMerger.MergeFilePartsToFormFile(chunksInFile, metadata.Name);
+
+
+            return File(sourceFile, "application/octet-stream", metadata.Name);
+
+        }
+        catch (Exception ex)
+        {
+            return Problem($"Ошибка на сервере: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Получить все доступнве метаданые
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    public ActionResult GetAllMetadata()
+    {
+        try
+        {
+            var metadata = _storageProvider.GetMetadata().Result;
+
+            return Ok(metadata);
+        }
+        catch (Exception ex)
+        {
+            return Problem($"Ошибка на сервере: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Удалить файл
+    /// </summary>
+    /// <param name="idMetadata"></param>
+    /// <returns></returns>
+    [HttpDelete("{idMetadata}")]
+    public ActionResult DeleteMetadata(int idMetadata)
+    {
+        try
+        {
+            _storageProvider.DeleteMetadataById(idMetadata);
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Problem($"Ошибка на сервере: {ex.Message}");
+        }
+    }
+
+    private readonly IFileStorage _fileStorage;
     private readonly storage.IStorage _storageProvider;
-    private readonly ILogger<MetadataController> _logger;
+    private readonly ILogger<FileController> _logger;
 }

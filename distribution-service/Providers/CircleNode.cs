@@ -17,14 +17,18 @@ public abstract class ICircleNode
 
 public class CircleServerNode : ICircleNode
 {
-    public int generalServer { set; get; }
-    public Role role { set; get; } = Role.SRVNODE;
+    public CircleServerNode()
+    {
+        role = Role.SRVNODE;
+    }
 }
 
 public class CircleChunkNode : ICircleNode
 {
-    public int generalFile { set; get; }
-    public Role role { set; get; } = Role.CHUNK;
+    public CircleChunkNode()
+    {
+        role = Role.CHUNK;
+    }
 }
 
 public struct Placement

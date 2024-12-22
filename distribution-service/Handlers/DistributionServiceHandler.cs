@@ -10,26 +10,27 @@ public class DistributionServiceHandler : distribution_service.DistributionServi
     }
 
     public async Task MakeReplications(
-        List<distribution_service.Chunk> requestChunks,
+       int IdMetadata,
         CancellationToken cancellationToken)
     {
         try
         {
 
-            _logger.LogInformation($"Получен запрос на создание репликаций для файла с id: {requestChunks.FirstOrDefault().IdMetadata}");
+            var chunks = await _storage.GetChunkByMetadataId(IdMetadata);
+
+            _logger.LogInformation($"Получен запрос на создание репликаций для файла с id: {IdMetadata}");
 
             var serverNodes = await _storage.GetVirtualNodes();
 
-            List<ICircleNode> chunks = [];
+            List<ICircleNode> chunkNodes = [];
 
             await Task.Run(() =>
             {
-                foreach (var chunk in requestChunks)
+                foreach (var chunk in chunks)
                 {
-                    chunks.Add(new CircleChunkNode()
+                    chunkNodes.Add(new CircleChunkNode()
                     {
-                        hash = chunk.ChunkHash,
-                        generalFile = chunk.IdMetadata
+                        hash = chunk.Hash,
                     });
                 }
             });
@@ -44,13 +45,12 @@ public class DistributionServiceHandler : distribution_service.DistributionServi
                         new CircleServerNode()
                         {
                             hash = node.Hash,
-                            generalServer = node.IdServer
                         }
                     );
               }
           });
 
-            var placer = new PlaceFounder(nodes, chunks, 3);
+            var placer = new PlaceFounder(nodes, chunkNodes, 1);
 
             placer.ComputePlacement();
 
@@ -62,9 +62,9 @@ public class DistributionServiceHandler : distribution_service.DistributionServi
             {
                 var replication = new models.Replication()
                 {
-                    IdServer = ((CircleServerNode)placement.virtualServerNode).generalServer,
+                    IdServer = _storage.GetServerByVirtualNodeHash(placement.virtualServerNode.hash).Result.Id,
                     HashChunk = placement.chunk.hash,
-                    IdMetadata = ((CircleChunkNode)placement.chunk).generalFile,
+                    IdMetadata = _storage.GetMetadataByChunkHash(placement.chunk.hash).Result.Id,
                 };
 
                 var server = await _storage.GetServer(replication.IdServer);

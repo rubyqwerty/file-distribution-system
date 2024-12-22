@@ -11,7 +11,8 @@ public class HashManager : IHashManager
 {
     public async Task<string> GetHash(HashParams hashParams)
     {
-        var transport = new TSocketTransport("localhost", 9090, new Thrift.TConfiguration());
+        var host = Environment.GetEnvironmentVariable("HASH_HOST") ?? "127.0.0.1";
+        var transport = new TSocketTransport(host, 9090, new Thrift.TConfiguration());
         var protocol = new TBinaryProtocol(transport);
         var client = new HashService.Client(protocol);
 

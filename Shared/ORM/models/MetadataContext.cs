@@ -84,9 +84,9 @@ public partial class MetadataContext : DbContext
                 .HasColumnType("timestamp")
                 .HasColumnName("Creation_date");
 
-            // entity.HasOne(d => d.IdServerNavigation).WithMany(p => p.Replications)
-            //      .HasForeignKey(d => d.IdServer)
-            //    .OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(d => d.IdServerNavigation).WithMany(p => p.Replications)
+                 .HasForeignKey(d => d.IdServer)
+               .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Chunk).WithMany(p => p.Replications)
                 .HasForeignKey(d => new { d.IdMetadata, d.HashChunk })
@@ -115,9 +115,9 @@ public partial class MetadataContext : DbContext
                 .HasColumnName("Id_server");
             entity.Property(e => e.Hash).HasColumnType("varchar(255)");
 
-            //   entity.HasOne(d => d.IdServerNavigation).WithMany(p => p.VirtualNodes)
-            //   .HasForeignKey(d => d.IdServer)
-            //  .OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(d => d.IdServerNavigation).WithMany(p => p.VirtualNodes)
+            .HasForeignKey(d => d.IdServer)
+           .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -1,0 +1,65 @@
+services:
+  metadata-service:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    container_name: metadata-service
+    environment:
+      ASPNETCORE_URLS: http://*:5091
+      HASH_HOST: hash-service
+      DISTRIBUTION_HOST: distribution-service
+      DB_HOST: 'Data Source=/metadata.db'
+    volumes:
+      - ../DB/metadata.db:/metadata.db
+      - ./file_storage:/tmp/file_storage 
+    ports:
+      - "5091:5091"
+    command: >
+      dotnet metadata-service.dll
+
+  distribution-service:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    container_name: distribution-service
+    environment:
+      DB_HOST: 'Data Source=/metadata.db'
+    volumes:
+      - ../DB/metadata.db:/metadata.db
+    command: >
+      dotnet distribution-service.dll
+  
+  server-service:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    container_name: server-service
+    environment:
+      ASPNETCORE_URLS: http://*:5173
+      DB_HOST: 'Data Source=/metadata.db'
+      HASH_HOST: hash-service
+    volumes:
+      - ../DB/metadata.db:/metadata.db
+    ports:
+      - "5173:5173"
+    command: >
+      dotnet server-service.dll
+
+  hash-service:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    container_name: hash-service
+    command: >
+      dotnet hash-service.dll
+
+  frontend:
+    build:
+      context: ../file-upload-app
+      dockerfile: Dockerfile.react
+    container_name: frontend
+    ports:
+      - "80:80"
+  
+    
+    

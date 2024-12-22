@@ -9,7 +9,6 @@ public class ServerController : ControllerBase
         _logger = logger;
         _storageProvider = storage;
         _virtualNodeManager = virtualNodeManager;
-        _logger.LogInformation("Контроллер обработки серверов запущен");
     }
 
     /// <summary>
@@ -33,9 +32,15 @@ public class ServerController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Удалить сервер
+    /// </summary>
+    /// <param name="idServer"></param>
+    /// <returns></returns>
     [HttpDelete("{idServer}")]
     public async Task<IActionResult> DeleteServer(int idServer)
     {
+        _logger.LogInformation($"Пришел запрос на удаление сервера с id {idServer}");
         try
         {
             await _storageProvider.DeleteServer(idServer);
@@ -47,9 +52,15 @@ public class ServerController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Получить сервер
+    /// </summary>
+    /// <param name="idServer"></param>
+    /// <returns></returns>
     [HttpGet("{idServer}")]
     public async Task<IActionResult> GetServer(int idServer)
     {
+        _logger.LogInformation($"Пришел запрос на получение сервера с id {idServer}");
         try
         {
             var server = await _storageProvider.GetServer(idServer);
@@ -65,14 +76,41 @@ public class ServerController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Обновить сервер
+    /// </summary>
+    /// <param name="idServer"></param>
+    /// <param name="newServer"></param>
+    /// <returns></returns>
     [HttpPut("{idServer}")]
     public async Task<IActionResult> Update(int idServer, [FromBody] models.Server newServer)
     {
+        _logger.LogInformation($"Пришел запрос на обновление сервера с id {idServer}");
         try
         {
             await _storageProvider.UpdateServer(idServer, newServer, _virtualNodeManager.RecreateVirtualNodes);
 
             return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Problem($"Ошибка на сервере: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Получить серверы
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    public async Task<ActionResult> GetServers()
+    {
+        _logger.LogInformation("Пришел запрос на получение серверов");
+        try
+        {
+            var servers = await _storageProvider.GetServers();
+
+            return Ok(servers);
         }
         catch (Exception ex)
         {

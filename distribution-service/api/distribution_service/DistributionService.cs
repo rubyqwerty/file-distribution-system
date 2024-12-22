@@ -37,7 +37,7 @@ namespace distribution_service
   {
     public interface IAsync
     {
-      global::System.Threading.Tasks.Task MakeReplications(List<global::distribution_service.Chunk> @chunks, CancellationToken cancellationToken = default);
+      global::System.Threading.Tasks.Task MakeReplications(int idMetadata, CancellationToken cancellationToken = default);
 
     }
 
@@ -52,21 +52,21 @@ namespace distribution_service
       {
       }
 
-      public async global::System.Threading.Tasks.Task MakeReplications(List<global::distribution_service.Chunk> @chunks, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task MakeReplications(int idMetadata, CancellationToken cancellationToken = default)
       {
-        await send_MakeReplications(@chunks, cancellationToken);
+        await send_MakeReplications(idMetadata, cancellationToken);
         await recv_MakeReplications(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task send_MakeReplications(List<global::distribution_service.Chunk> @chunks, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task send_MakeReplications(int idMetadata, CancellationToken cancellationToken = default)
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("MakeReplications", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp5 = new InternalStructs.MakeReplications_args() {
-          Chunks = @chunks,
+        var tmp0 = new InternalStructs.MakeReplications_args() {
+          IdMetadata = idMetadata,
         };
         
-        await tmp5.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp0.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -74,16 +74,16 @@ namespace distribution_service
       public async global::System.Threading.Tasks.Task recv_MakeReplications(CancellationToken cancellationToken = default)
       {
         
-        var tmp6 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp6.Type == TMessageType.Exception)
+        var tmp1 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp1.Type == TMessageType.Exception)
         {
-          var tmp7 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp2 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp7;
+          throw tmp2;
         }
 
-        var tmp8 = new InternalStructs.MakeReplications_result();
-        await tmp8.ReadAsync(InputProtocol, cancellationToken);
+        var tmp3 = new InternalStructs.MakeReplications_result();
+        await tmp3.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
       }
 
@@ -142,30 +142,30 @@ namespace distribution_service
 
       public async global::System.Threading.Tasks.Task MakeReplications_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp9 = new InternalStructs.MakeReplications_args();
-        await tmp9.ReadAsync(iprot, cancellationToken);
+        var tmp4 = new InternalStructs.MakeReplications_args();
+        await tmp4.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp10 = new InternalStructs.MakeReplications_result();
+        var tmp5 = new InternalStructs.MakeReplications_result();
         try
         {
-          await _iAsync.MakeReplications(tmp9.Chunks, cancellationToken);
+          await _iAsync.MakeReplications(tmp4.IdMetadata, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("MakeReplications", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp10.WriteAsync(oprot, cancellationToken);
+          await tmp5.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp11)
+        catch (Exception tmp6)
         {
-          var tmp12 = $"Error occurred in {GetType().FullName}: {tmp11.Message}";
+          var tmp7 = $"Error occurred in {GetType().FullName}: {tmp6.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp11, tmp12);
+            _logger.LogError("{Exception}, {Message}", tmp6, tmp7);
           else
-            Console.Error.WriteLine(tmp12);
-          var tmp13 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp7);
+          var tmp8 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("MakeReplications", TMessageType.Exception, seqid), cancellationToken);
-          await tmp13.WriteAsync(oprot, cancellationToken);
+          await tmp8.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -178,18 +178,18 @@ namespace distribution_service
 
       public partial class MakeReplications_args : TBase
       {
-        private List<global::distribution_service.Chunk> _chunks;
+        private int _idMetadata;
 
-        public List<global::distribution_service.Chunk> Chunks
+        public int IdMetadata
         {
           get
           {
-            return _chunks;
+            return _idMetadata;
           }
           set
           {
-            __isset.@chunks = true;
-            this._chunks = value;
+            __isset.idMetadata = true;
+            this._idMetadata = value;
           }
         }
 
@@ -197,7 +197,7 @@ namespace distribution_service
         public Isset __isset;
         public struct Isset
         {
-          public bool @chunks;
+          public bool idMetadata;
         }
 
         public MakeReplications_args()
@@ -206,13 +206,13 @@ namespace distribution_service
 
         public MakeReplications_args DeepCopy()
         {
-          var tmp14 = new MakeReplications_args();
-          if((Chunks != null) && __isset.@chunks)
+          var tmp9 = new MakeReplications_args();
+          if(__isset.idMetadata)
           {
-            tmp14.Chunks = this.Chunks.DeepCopy();
+            tmp9.IdMetadata = this.IdMetadata;
           }
-          tmp14.__isset.@chunks = this.__isset.@chunks;
-          return tmp14;
+          tmp9.__isset.idMetadata = this.__isset.idMetadata;
+          return tmp9;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -233,20 +233,9 @@ namespace distribution_service
               switch (field.ID)
               {
                 case 1:
-                  if (field.Type == TType.List)
+                  if (field.Type == TType.I32)
                   {
-                    {
-                      var _list15 = await iprot.ReadListBeginAsync(cancellationToken);
-                      Chunks = new List<global::distribution_service.Chunk>(_list15.Count);
-                      for(int _i16 = 0; _i16 < _list15.Count; ++_i16)
-                      {
-                        global::distribution_service.Chunk _elem17;
-                        _elem17 = new global::distribution_service.Chunk();
-                        await _elem17.ReadAsync(iprot, cancellationToken);
-                        Chunks.Add(_elem17);
-                      }
-                      await iprot.ReadListEndAsync(cancellationToken);
-                    }
+                    IdMetadata = await iprot.ReadI32Async(cancellationToken);
                   }
                   else
                   {
@@ -274,21 +263,16 @@ namespace distribution_service
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp18 = new TStruct("MakeReplications_args");
-            await oprot.WriteStructBeginAsync(tmp18, cancellationToken);
-            var tmp19 = new TField();
-            if((Chunks != null) && __isset.@chunks)
+            var tmp10 = new TStruct("MakeReplications_args");
+            await oprot.WriteStructBeginAsync(tmp10, cancellationToken);
+            var tmp11 = new TField();
+            if(__isset.idMetadata)
             {
-              tmp19.Name = "chunks";
-              tmp19.Type = TType.List;
-              tmp19.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp19, cancellationToken);
-              await oprot.WriteListBeginAsync(new TList(TType.Struct, Chunks.Count), cancellationToken);
-              foreach (global::distribution_service.Chunk _iter20 in Chunks)
-              {
-                await _iter20.WriteAsync(oprot, cancellationToken);
-              }
-              await oprot.WriteListEndAsync(cancellationToken);
+              tmp11.Name = "idMetadata";
+              tmp11.Type = TType.I32;
+              tmp11.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp11, cancellationToken);
+              await oprot.WriteI32Async(IdMetadata, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             await oprot.WriteFieldStopAsync(cancellationToken);
@@ -304,15 +288,15 @@ namespace distribution_service
         {
           if (!(that is MakeReplications_args other)) return false;
           if (ReferenceEquals(this, other)) return true;
-          return ((__isset.@chunks == other.__isset.@chunks) && ((!__isset.@chunks) || (global::System.Object.Equals(Chunks, other.Chunks))));
+          return ((__isset.idMetadata == other.__isset.idMetadata) && ((!__isset.idMetadata) || (global::System.Object.Equals(IdMetadata, other.IdMetadata))));
         }
 
         public override int GetHashCode() {
           int hashcode = 157;
           unchecked {
-            if((Chunks != null) && __isset.@chunks)
+            if(__isset.idMetadata)
             {
-              hashcode = (hashcode * 397) + Chunks.GetHashCode();
+              hashcode = (hashcode * 397) + IdMetadata.GetHashCode();
             }
           }
           return hashcode;
@@ -320,16 +304,16 @@ namespace distribution_service
 
         public override string ToString()
         {
-          var tmp21 = new StringBuilder("MakeReplications_args(");
-          int tmp22 = 0;
-          if((Chunks != null) && __isset.@chunks)
+          var tmp12 = new StringBuilder("MakeReplications_args(");
+          int tmp13 = 0;
+          if(__isset.idMetadata)
           {
-            if(0 < tmp22++) { tmp21.Append(", "); }
-            tmp21.Append("Chunks: ");
-            Chunks.ToString(tmp21);
+            if(0 < tmp13++) { tmp12.Append(", "); }
+            tmp12.Append("IdMetadata: ");
+            IdMetadata.ToString(tmp12);
           }
-          tmp21.Append(')');
-          return tmp21.ToString();
+          tmp12.Append(')');
+          return tmp12.ToString();
         }
       }
 
@@ -343,8 +327,8 @@ namespace distribution_service
 
         public MakeReplications_result DeepCopy()
         {
-          var tmp23 = new MakeReplications_result();
-          return tmp23;
+          var tmp14 = new MakeReplications_result();
+          return tmp14;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -385,8 +369,8 @@ namespace distribution_service
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp24 = new TStruct("MakeReplications_result");
-            await oprot.WriteStructBeginAsync(tmp24, cancellationToken);
+            var tmp15 = new TStruct("MakeReplications_result");
+            await oprot.WriteStructBeginAsync(tmp15, cancellationToken);
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
           }
@@ -412,9 +396,9 @@ namespace distribution_service
 
         public override string ToString()
         {
-          var tmp25 = new StringBuilder("MakeReplications_result(");
-          tmp25.Append(')');
-          return tmp25.ToString();
+          var tmp16 = new StringBuilder("MakeReplications_result(");
+          tmp16.Append(')');
+          return tmp16.ToString();
         }
       }
 

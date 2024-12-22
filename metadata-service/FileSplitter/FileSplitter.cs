@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
+public class StoredChunk
+{
+    public List<MemoryStream> Chunks { set; get; } = new();
+    public List<string> Hashes { set; get; } = new();
+}
+
 public static class FileSplitter
 {
     /// <summary>
