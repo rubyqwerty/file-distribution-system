@@ -53,6 +53,21 @@ services:
     command: >
       dotnet hash-service.dll
 
+  gateway:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    container_name: gateway
+    environment:
+      ASPNETCORE_URLS: http://*:5231
+      ROUTING_CONFIG: /config/routing.json
+    volumes:
+      - ../../gateway/Properties/routing.docker.json:/config/routing.json
+    ports:
+      - "5231:5231"
+    command: >
+      dotnet gateway.dll
+
   frontend:
     build:
       context: ../file-upload-app

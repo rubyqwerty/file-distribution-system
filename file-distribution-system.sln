@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hash-service", "hash-servic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "metadata-service", "metadata-service\metadata-service.csproj", "{39A89D1F-FC68-4AA5-AB3A-490D729C904C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gateway", "gateway\gateway.csproj", "{A614DB01-1EEF-4826-ABD8-82983D47AC25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{39A89D1F-FC68-4AA5-AB3A-490D729C904C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39A89D1F-FC68-4AA5-AB3A-490D729C904C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39A89D1F-FC68-4AA5-AB3A-490D729C904C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A614DB01-1EEF-4826-ABD8-82983D47AC25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A614DB01-1EEF-4826-ABD8-82983D47AC25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A614DB01-1EEF-4826-ABD8-82983D47AC25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A614DB01-1EEF-4826-ABD8-82983D47AC25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

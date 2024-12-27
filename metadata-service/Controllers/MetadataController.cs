@@ -105,18 +105,26 @@ public class FileController : ControllerBase
             {
                 var replications = await _storageProvider.GetReplications(chunk.Hash);
 
+                bool isLoadedChunk = false;
+
                 foreach (var replication in replications)
                 {
                     var address = _storageProvider.GetServer(replication.IdServer).Result.Address;
                     try
                     {
                         chunksInFile.Add(_fileStorage.GetChunkFromStorage(address, chunk.Hash));
+                        isLoadedChunk = true;
                         break;
                     }
                     catch (Exception ex)
                     {
                         _logger.LogInformation($"Не получилось считать чанк: {replication.HashChunk} из {address} {ex.Message}");
                     }
+                }
+
+                if (isLoadedChunk == false)
+                {
+                    return NotFound("Не удалось восстановить файл. Был потерен чанк");
                 }
             }
 

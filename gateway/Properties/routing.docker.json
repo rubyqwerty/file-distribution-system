@@ -1,0 +1,33 @@
+{
+    "Routes": [
+      {
+        "DownstreamPathTemplate": "/api/file/{everything}",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "metadata-service",
+            "Port": 5091
+          }
+        ],
+        "UpstreamPathTemplate": "/gateway/file/{everything}",
+        "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+      },
+
+      {
+        "DownstreamPathTemplate": "/api/server/{everything}",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "server-service",
+            "Port": 5173
+          }
+        ],
+        "UpstreamPathTemplate": "/gateway/server/{everything}",
+        "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+      }
+    ],
+    "GlobalConfiguration": {
+      "BaseUrl": "http://localhost:5000"
+    }
+  }
+  

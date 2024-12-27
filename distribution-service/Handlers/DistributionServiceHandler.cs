@@ -7,6 +7,7 @@ public class DistributionServiceHandler : distribution_service.DistributionServi
         _logger = logger;
         _storage = storage;
         _logger.LogInformation("Создан обработчик запросов службы репликаций");
+        _numberOfReplications = int.Parse(Environment.GetEnvironmentVariable("NUMBER_REPLICATION") ?? "1");
     }
 
     public async Task MakeReplications(
@@ -50,7 +51,7 @@ public class DistributionServiceHandler : distribution_service.DistributionServi
               }
           });
 
-            var placer = new PlaceFounder(nodes, chunkNodes, 1);
+            var placer = new PlaceFounder(nodes, chunkNodes, _numberOfReplications);
 
             placer.ComputePlacement();
 
@@ -84,6 +85,8 @@ public class DistributionServiceHandler : distribution_service.DistributionServi
             throw;
         }
     }
+
+    private readonly int _numberOfReplications;
 
     private readonly ILogger<DistributionServiceHandler> _logger;
 

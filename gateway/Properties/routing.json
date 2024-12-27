@@ -1,0 +1,52 @@
+{
+    "Routes": [
+      {
+        "DownstreamPathTemplate": "/user/{everything}",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 5555
+          }
+        ],
+        "UpstreamPathTemplate": "/gateway/user/{everything}",
+        "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+        "AuthenticationOptions": {
+          "AuthenticationProviderKey": "JwtBearer"
+        }
+      },
+
+      {
+        "DownstreamPathTemplate": "/file/{everything}",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 5556
+          }
+        ],
+        "UpstreamPathTemplate": "/gateway/file/{everything}",
+        "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+        "AuthenticationOptions": {
+          "AuthenticationProviderKey": "JwtBearer"
+        }
+      },
+
+      {
+        "DownstreamPathTemplate": "/api/Auth/login/{everything}",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 5225
+          }
+        ],
+        "UpstreamPathTemplate": "/gateway/login/{everything}",
+        "UpstreamHttpMethod": [ "Post" ]
+      }
+    ],
+    "GlobalConfiguration": {
+      "BaseUrl": "http://localhost:5000"
+    }
+  }
+  
